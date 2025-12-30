@@ -26,7 +26,7 @@ const ThemeToggle: React.FC = () => {
     return (
         <button
             onClick={toggleTheme}
-            className="fixed bottom-8 right-8 z-[100] p-4 bg-black border border-[#00ff88]/40 text-[#00ff88] hover:bg-[#00ff88]/10 hover:border-[#00ff88] transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.5)] group overflow-hidden"
+            className="fixed bottom-8 right-8 z-[100] p-4 bg-[var(--gpsx-bg-card)] border border-[var(--gpsx-accent-primary)]/40 text-[var(--gpsx-accent-primary)] hover:bg-[var(--gpsx-accent-primary)]/10 hover:border-[var(--gpsx-accent-primary)] transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.5)] group overflow-hidden"
             title={theme === 'matrix' ? '切换至午夜霓虹主题' : '切换至黑客帝国主题'}
         >
             <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
