@@ -2,24 +2,27 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { HelpCircle, X, Zap, FileAudio, Sparkles, Download, Settings } from 'lucide-react';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const AppLayout: React.FC = () => {
     const [showHelp, setShowHelp] = useState(false);
 
     return (
-        <div className="min-h-screen bg-black flex overflow-hidden font-mono selection:bg-[#00ff88]/30 selection:text-[#00ff88]">
+        <div className="min-h-screen bg-[var(--gpsx-bg-main)] flex overflow-hidden font-mono selection:bg-[var(--gpsx-accent-primary)]/30 selection:text-[var(--gpsx-accent-primary)]">
             {/* Sidebar */}
             <Sidebar />
+
+            <ThemeToggle />
 
             {/* Main Content Area */}
             <div className="flex-1 flex flex-col min-h-screen overflow-hidden relative border-l border-white/5">
                 <div className="gpsx-scanline"></div>
 
                 {/* Top Header */}
-                <header className="h-14 bg-black/50 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-8 sticky top-0 z-10 transition-all duration-300">
+                <header className="h-14 bg-[var(--gpsx-bg-main)]/50 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-8 sticky top-0 z-10 transition-all duration-300">
                     <div className="flex items-center gap-4">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#00ff88] animate-pulse"></div>
-                        <span className="text-[11px] font-black text-[#00ff88]/40 tracking-widest uppercase">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[var(--gpsx-accent-primary)] animate-pulse"></div>
+                        <span className="text-[11px] font-black text-[var(--gpsx-accent-primary)]/40 tracking-widest uppercase">
                             // 系统节点已上线
                         </span>
                     </div>
@@ -35,7 +38,7 @@ const AppLayout: React.FC = () => {
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 overflow-auto bg-[#020202]">
+                <main className="flex-1 overflow-auto bg-[var(--gpsx-bg-main)]">
                     <div className="max-w-[1600px] mx-auto min-h-full">
                         <Outlet />
                     </div>

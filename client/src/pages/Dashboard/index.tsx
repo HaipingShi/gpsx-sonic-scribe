@@ -84,7 +84,7 @@ const Dashboard: React.FC = () => {
             'FAILED': '处理失败',
         };
         return (
-            <span className={`px-2 py-0.5 text-[12px] font-black uppercase tracking-widest border bg-black ${styles[status] || styles['UPLOADED']}`}>
+            <span className={`px-2 py-0.5 text-[12px] font-black uppercase tracking-widest border bg-[var(--gpsx-bg-card)] ${styles[status] || styles['UPLOADED']}`}>
                 {names[status] || status}
             </span>
         );
@@ -111,7 +111,7 @@ const Dashboard: React.FC = () => {
     }> = ({ icon, title, description, onClick }) => (
         <button
             onClick={onClick}
-            className="group relative p-6 border border-white/5 bg-black hover:border-[#00ff88]/40 transition-all duration-300 text-left overflow-hidden"
+            className="group relative p-6 border border-white/5 bg-[var(--gpsx-bg-card)] hover:border-[var(--gpsx-accent-primary)]/40 transition-all duration-300 text-left overflow-hidden"
         >
             <div className="absolute top-0 right-0 p-2 text-white/5 group-hover:text-[#00ff88]/10 transition-colors">
                 <Zap size={48} strokeWidth={1} />
@@ -137,8 +137,8 @@ const Dashboard: React.FC = () => {
                 <div>
                     <h1 className="text-4xl font-black text-white tracking-widest gpsx-glow">控制台</h1>
                     <div className="flex items-center gap-2 mt-2">
-                        <span className="text-[12px] text-[#00ff88]/60 font-bold uppercase tracking-wider">系统状态: 节点运行正常</span>
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#00ff88] shadow-[0_0_5px_#00ff88] animate-pulse"></div>
+                        <span className="text-[12px] text-[var(--gpsx-accent-primary)]/60 font-bold uppercase tracking-wider">系统状态: 节点运行正常</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-[var(--gpsx-accent-primary)] shadow-[0_0_5px_var(--gpsx-accent-primary)] animate-pulse"></div>
                     </div>
                 </div>
                 <button
@@ -156,14 +156,14 @@ const Dashboard: React.FC = () => {
                 {stats.map((stat, index) => (
                     <div
                         key={index}
-                        className="bg-black border border-white/5 p-6 relative group hover:border-[#00ff88]/20 transition-all overflow-hidden"
+                        className="bg-[var(--gpsx-bg-card)] border border-white/5 p-6 relative group hover:border-[var(--gpsx-accent-primary)]/20 transition-all overflow-hidden"
                     >
-                        <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-[#00ff88]/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-[var(--gpsx-accent-primary)]/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         <div className="flex items-center justify-between mb-4">
                             <span className="text-[12px] font-black text-slate-400 uppercase tracking-widest leading-none">
                                 // {stat.label}
                             </span>
-                            <div className="text-[#00ff88]/40">
+                            <div className="text-[var(--gpsx-accent-primary)]/40">
                                 {React.cloneElement(stat.icon as React.ReactElement, { size: 16 })}
                             </div>
                         </div>
@@ -210,7 +210,7 @@ const Dashboard: React.FC = () => {
                     </div>
                     <button
                         onClick={() => navigate('/history')}
-                        className="ml-6 text-[12px] font-black text-[#00ff88]/60 hover:text-[#00ff88] transition-colors uppercase tracking-wider flex items-center gap-2"
+                        className="ml-6 text-[12px] font-black text-[var(--gpsx-accent-primary)]/60 hover:text-[var(--gpsx-accent-primary)] transition-colors uppercase tracking-wider flex items-center gap-2"
                     >
                         查看全部历史记录 <ArrowRight size={14} />
                     </button>
@@ -226,7 +226,7 @@ const Dashboard: React.FC = () => {
                         <p className="text-[11px] font-black text-slate-500 tracking-widest uppercase">未检测到近期活动记录</p>
                     </div>
                 ) : (
-                    <div className="bg-black border border-white/5 overflow-hidden">
+                    <div className="bg-[var(--gpsx-bg-card)] border border-white/5 overflow-hidden">
                         <table className="w-full text-left font-mono">
                             <thead>
                                 <tr className="bg-white/[0.02] border-b border-white/5 text-[12px] font-black text-slate-400 uppercase tracking-widest">
@@ -238,10 +238,10 @@ const Dashboard: React.FC = () => {
                             </thead>
                             <tbody className="divide-y divide-white/5">
                                 {recentProjects.map((project) => (
-                                    <tr key={project.id} className="group hover:bg-[#00ff88]/[0.02] transition-colors">
+                                    <tr key={project.id} className="group hover:bg-[var(--gpsx-accent-primary)]/[0.02] transition-colors">
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-8 h-8 border border-white/10 group-hover:border-[#00ff88]/40 flex items-center justify-center text-slate-600 group-hover:text-[#00ff88] transition-all bg-white/[0.02]">
+                                                <div className="w-8 h-8 border border-white/10 group-hover:border-[var(--gpsx-accent-primary)]/40 flex items-center justify-center text-slate-600 group-hover:text-[var(--gpsx-accent-primary)] transition-all bg-white/[0.02]">
                                                     <FileAudio size={14} />
                                                 </div>
                                                 <span className="text-xs font-bold text-white tracking-widest uppercase truncate max-w-sm">

@@ -80,16 +80,16 @@ const MergePage: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-black flex flex-col items-center justify-center font-mono p-8">
-                <Loader2 className="w-10 h-10 text-[#00ff88] animate-spin mb-4" />
-                <p className="text-[#00ff88] text-sm font-black uppercase tracking-widest">正在同步合并节点数据流...</p>
+            <div className="min-h-screen bg-[var(--gpsx-bg-main)] flex flex-col items-center justify-center font-mono p-8">
+                <Loader2 className="w-10 h-10 text-[var(--gpsx-accent-primary)] animate-spin mb-4" />
+                <p className="text-[var(--gpsx-accent-primary)] text-sm font-black uppercase tracking-widest">正在同步合并节点数据流...</p>
             </div>
         );
     }
 
     if (error || !document) {
         return (
-            <div className="min-h-screen bg-black flex flex-col items-center justify-center font-mono p-8">
+            <div className="min-h-screen bg-[var(--gpsx-bg-main)] flex flex-col items-center justify-center font-mono p-8">
                 <AlertCircle className="w-12 h-12 text-red-500 mb-6" />
                 <div className="text-red-500 text-xl font-black uppercase tracking-widest">{error || '错误：资产不存在'}</div>
                 <button onClick={() => navigate(-1)} className="mt-8 text-slate-500 hover:text-white uppercase text-sm font-black">&lt; 返回系统主页</button>
@@ -101,22 +101,22 @@ const MergePage: React.FC = () => {
     const totalWords = countWords(document.merged.polished);
 
     return (
-        <div className="min-h-screen bg-black font-mono">
+        <div className="min-h-screen bg-[var(--gpsx-bg-main)] font-mono">
             {/* Header */}
-            <header className="sticky top-0 z-10 bg-black border-b border-white/5 backdrop-blur-md bg-black/80">
+            <header className="sticky top-0 z-10 bg-[var(--gpsx-bg-main)]/80 border-b border-white/5 backdrop-blur-md">
                 <div className="max-w-7xl mx-auto px-8 py-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-6">
                             <button
                                 onClick={() => navigate(-1)}
-                                className="text-slate-500 hover:text-[#00ff88] transition-colors"
+                                className="text-slate-500 hover:text-[var(--gpsx-accent-primary)] transition-colors"
                             >
                                 <ArrowLeft size={24} />
                             </button>
                             <div>
                                 <h1 className="text-2xl font-black text-white uppercase tracking-widest flex items-center gap-4">
                                     数据整合中心
-                                    <span className="text-[11px] bg-[#00ff88]/10 text-[#00ff88] border border-[#00ff88]/20 px-2 py-0.5 font-black">运行中</span>
+                                    <span className="text-[11px] bg-[var(--gpsx-accent-primary)]/10 text-[var(--gpsx-accent-primary)] border border-[var(--gpsx-accent-primary)]/20 px-2 py-0.5 font-black">运行中</span>
                                 </h1>
                                 <p className="text-[12px] text-slate-500 mt-1 font-bold uppercase tracking-widest">
                                     [ ID: {id?.slice(0, 12)}... ] | {validChunks.length} 切片已恢复 | ~{totalWords.toLocaleString()} 字符数
@@ -126,7 +126,7 @@ const MergePage: React.FC = () => {
 
                         <div className="flex items-center gap-4">
                             {/* View Mode Toggle */}
-                            <div className="flex border border-white/5 bg-black p-1">
+                            <div className="flex border border-white/5 bg-[var(--gpsx-bg-main)] p-1">
                                 <button
                                     onClick={() => setViewMode('comparison')}
                                     className={cn(
@@ -168,7 +168,7 @@ const MergePage: React.FC = () => {
                             </button>
                             <button
                                 onClick={() => handleExport('md')}
-                                className="px-4 py-2 border border-blue-500 text-blue-500 text-[12px] font-black uppercase tracking-widest hover:bg-blue-500 hover:text-white transition-all"
+                                className="px-4 py-2 border border-[var(--gpsx-accent-secondary)] text-[var(--gpsx-accent-secondary)] text-[12px] font-black uppercase tracking-widest hover:bg-[var(--gpsx-accent-secondary)] hover:text-white transition-all"
                             >
                                 <Download size={14} className="mr-2 inline" /> 导出 MD
                             </button>
@@ -182,11 +182,11 @@ const MergePage: React.FC = () => {
                     /* Dual-Window Comparison View */
                     <div className="grid grid-cols-2 gap-8 h-[calc(100vh-250px)]">
                         {/* Left Panel: Raw Text */}
-                        <div className="bg-[#050505] border border-white/5 flex flex-col relative overflow-hidden group">
+                        <div className="bg-[var(--gpsx-bg-card)] border border-white/5 flex flex-col relative overflow-hidden group">
                             <div className="gpsx-scanline opacity-5 pointer-events-none"></div>
-                            <div className="px-6 py-4 bg-black border-b border-white/5 flex items-center justify-between">
+                            <div className="px-6 py-4 bg-[var(--gpsx-bg-main)] border-b border-white/5 flex items-center justify-between">
                                 <h2 className="text-[12px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                                    <div className="w-1 h-1 bg-blue-400" /> 原始 ASR 输入
+                                    <div className="w-1 h-1 bg-[var(--gpsx-accent-secondary)]" /> 原始 ASR 输入
                                 </h2>
                                 <span className="text-[11px] text-slate-700 font-bold uppercase">识别源: WHISPER_V3</span>
                             </div>
@@ -197,7 +197,7 @@ const MergePage: React.FC = () => {
                                         className={cn(
                                             'p-6 border-b border-white/5 cursor-pointer transition-all',
                                             selectedChunk === chunk.index
-                                                ? 'bg-blue-400/5 border-l-2 border-l-blue-400'
+                                                ? 'bg-[var(--gpsx-accent-secondary)]/5 border-l-2 border-l-[var(--gpsx-accent-secondary)]'
                                                 : 'hover:bg-white/[0.02] border-l-2 border-l-transparent'
                                         )}
                                         onClick={() => setSelectedChunk(chunk.index)}
@@ -221,13 +221,13 @@ const MergePage: React.FC = () => {
                         </div>
 
                         {/* Right Panel: Polished Text */}
-                        <div className="bg-[#050505] border border-white/5 flex flex-col relative overflow-hidden group">
+                        <div className="bg-[var(--gpsx-bg-card)] border border-white/5 flex flex-col relative overflow-hidden group">
                             <div className="gpsx-scanline opacity-5 pointer-events-none"></div>
-                            <div className="px-6 py-4 bg-black border-b border-white/5 flex items-center justify-between">
-                                <h2 className="text-[12px] font-black text-[#00ff88] uppercase tracking-widest flex items-center gap-2">
-                                    <div className="w-1 h-1 bg-[#00ff88] animate-pulse" /> 精炼输出结果
+                            <div className="px-6 py-4 bg-[var(--gpsx-bg-main)] border-b border-white/5 flex items-center justify-between">
+                                <h2 className="text-[12px] font-black text-[var(--gpsx-accent-primary)] uppercase tracking-widest flex items-center gap-2">
+                                    <div className="w-1 h-1 bg-[var(--gpsx-accent-primary)] animate-pulse" /> 精炼输出结果
                                 </h2>
-                                <span className="text-[11px] text-[#00ff88]/40 font-bold uppercase">处理器: Google Gemini 3 Flash</span>
+                                <span className="text-[11px] text-[var(--gpsx-accent-primary)]/40 font-bold uppercase">处理器: Google Gemini 3 Flash</span>
                             </div>
                             <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent">
                                 {validChunks.map((chunk) => (
@@ -236,18 +236,18 @@ const MergePage: React.FC = () => {
                                         className={cn(
                                             'p-6 border-b border-white/5 transition-all',
                                             selectedChunk === chunk.index
-                                                ? 'bg-[#00ff88]/5 border-l-2 border-l-[#00ff88]'
+                                                ? 'bg-[var(--gpsx-accent-primary)]/5 border-l-2 border-l-[var(--gpsx-accent-primary)]'
                                                 : 'border-l-2 border-l-transparent'
                                         )}
                                     >
                                         <div className="flex items-center justify-between mb-4">
-                                            <span className="text-[11px] font-black text-[#00ff88] border border-[#00ff88]/20 px-1.5 py-0.5 uppercase">
+                                            <span className="text-[11px] font-black text-[var(--gpsx-accent-primary)] border border-[var(--gpsx-accent-primary)]/20 px-1.5 py-0.5 uppercase">
                                                 精炼索引_{String(chunk.index).padStart(3, '0')}
                                             </span>
                                             <span className={cn(
                                                 'text-[11px] font-black uppercase tracking-widest px-2 py-0.5 border',
                                                 chunk.status === 'APPROVED' || chunk.status === 'POLISHED'
-                                                    ? 'border-[#00ff88]/20 text-[#00ff88]'
+                                                    ? 'border-[var(--gpsx-accent-primary)]/20 text-[var(--gpsx-accent-primary)]'
                                                     : 'border-amber-500/20 text-amber-500'
                                             )}>
                                                 {chunk.status === 'APPROVED' || chunk.status === 'POLISHED' ? '[ 已完成 ]' : '[ 等待中 ]'}
@@ -259,7 +259,7 @@ const MergePage: React.FC = () => {
 
                                         {/* Audio Player */}
                                         {chunk.audioPath && (
-                                            <div className="mt-6 border border-white/5 bg-black p-4">
+                                            <div className="mt-6 border border-white/5 bg-[var(--gpsx-bg-main)] p-4">
                                                 <AudioPlayer
                                                     src={`http://localhost:3001${chunk.audioPath}`}
                                                     duration={chunk.durationMs / 1000}
@@ -273,11 +273,11 @@ const MergePage: React.FC = () => {
                     </div>
                 ) : (
                     /* Merged View */
-                    <div className="bg-[#050505] border border-white/5 p-10 relative overflow-hidden group">
+                    <div className="bg-[var(--gpsx-bg-card)] border border-white/5 p-10 relative overflow-hidden group">
                         <div className="gpsx-scanline opacity-5 pointer-events-none"></div>
                         <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
                             <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-4">
-                                <FileText size={20} className="text-[#00ff88]" />
+                                <FileText size={20} className="text-[var(--gpsx-accent-primary)]" />
                                 主精炼存档存档中心
                             </h2>
                             <div className="text-[11px] text-slate-700 font-bold uppercase tracking-widest">
@@ -295,16 +295,16 @@ const MergePage: React.FC = () => {
                         <div className="mt-16 pt-8 border-t border-white/5">
                             <div className="grid grid-cols-4 gap-8">
                                 <div className="text-center group/stat">
-                                    <div className="text-sm font-black text-slate-600 uppercase tracking-widest mb-2 group-hover/stat:text-[#00ff88] transition-colors">切片总量</div>
+                                    <div className="text-sm font-black text-slate-600 uppercase tracking-widest mb-2 group-hover/stat:text-[var(--gpsx-accent-primary)] transition-colors">切片总量</div>
                                     <div className="text-3xl font-black text-white">{validChunks.length}</div>
                                 </div>
                                 <div className="text-center group/stat">
-                                    <div className="text-sm font-black text-slate-600 uppercase tracking-widest mb-2 group-hover/stat:text-blue-400 transition-colors">总字符数</div>
+                                    <div className="text-sm font-black text-slate-600 uppercase tracking-widest mb-2 group-hover/stat:text-[var(--gpsx-accent-secondary)] transition-colors">总字符数</div>
                                     <div className="text-3xl font-black text-white">{totalWords.toLocaleString()}</div>
                                 </div>
                                 <div className="text-center group/stat">
-                                    <div className="text-sm font-black text-slate-600 uppercase tracking-widest mb-2 group-hover/stat:text-[#00ff88] transition-colors">校验效率</div>
-                                    <div className="text-3xl font-black text-[#00ff88]">100%</div>
+                                    <div className="text-sm font-black text-slate-600 uppercase tracking-widest mb-2 group-hover/stat:text-[var(--gpsx-accent-primary)] transition-colors">校验效率</div>
+                                    <div className="text-3xl font-black text-[var(--gpsx-accent-primary)]">100%</div>
                                 </div>
                                 <div className="text-center group/stat">
                                     <div className="text-sm font-black text-slate-600 uppercase tracking-widest mb-2 group-hover/stat:text-amber-500 transition-colors">异常检测</div>

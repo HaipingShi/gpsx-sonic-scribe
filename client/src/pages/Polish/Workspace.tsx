@@ -280,9 +280,9 @@ const PolishWorkspace: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="h-[calc(100vh-64px)] flex items-center justify-center">
+            <div className="h-[calc(100vh-64px)] flex items-center justify-center bg-[var(--gpsx-bg-main)]">
                 <div className="text-center">
-                    <Loader2 className="w-10 h-10 text-amber-500 animate-spin mx-auto mb-4" />
+                    <Loader2 className="w-10 h-10 text-[var(--gpsx-accent-primary)] animate-spin mx-auto mb-4" />
                     <p className="text-slate-400">加载项目数据...</p>
                 </div>
             </div>
@@ -307,7 +307,7 @@ const PolishWorkspace: React.FC = () => {
     }
 
     return (
-        <div className="h-[calc(100vh-64px)] flex flex-col">
+        <div className="h-[calc(100vh-64px)] flex flex-col bg-[var(--gpsx-bg-main)]">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
                 <div className="flex items-center gap-4">
@@ -319,7 +319,7 @@ const PolishWorkspace: React.FC = () => {
                     </button>
                     <div>
                         <h1 className="text-xl font-bold text-white flex items-center gap-2">
-                            <Sparkles className="text-amber-400" size={20} />
+                            <Sparkles className="text-[var(--gpsx-accent-primary)]" size={20} />
                             清洗工作台
                         </h1>
                         <p className="text-slate-500 text-sm">
@@ -331,9 +331,9 @@ const PolishWorkspace: React.FC = () => {
                 <div className="flex items-center gap-3">
                     {/* Progress */}
                     <div className="flex items-center gap-3">
-                        <div className="w-32 h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div className="w-32 h-2 bg-white/5 rounded-full overflow-hidden">
                             <div
-                                className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-500"
+                                className="h-full bg-gradient-to-r from-[var(--gpsx-accent-primary)] to-[var(--gpsx-accent-secondary)] transition-all duration-500"
                                 style={{ width: `${progress}%` }}
                             />
                         </div>
@@ -348,13 +348,13 @@ const PolishWorkspace: React.FC = () => {
                         value={customFilename}
                         onChange={(e) => setCustomFilename(e.target.value)}
                         placeholder={project?.originalFilename?.replace(/\.[^/.]+$/, '') || '输出文件名'}
-                        className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm w-32 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                        className="px-3 py-2 bg-[var(--gpsx-bg-card)] border border-white/5 rounded-lg text-white text-sm w-32 focus:outline-none focus:ring-1 focus:ring-[var(--gpsx-accent-primary)]"
                     />
 
                     {/* Prompt Config Toggle */}
                     <button
                         onClick={() => setShowPromptPanel(!showPromptPanel)}
-                        className={`p-2 rounded-lg transition-colors flex items-center gap-1 ${showPromptPanel ? 'bg-purple-500/20 text-purple-400' : 'bg-slate-800 text-slate-400 hover:text-white'
+                        className={`p-2 rounded-lg transition-colors flex items-center gap-1 ${showPromptPanel ? 'bg-[var(--gpsx-accent-secondary)]/20 text-[var(--gpsx-accent-secondary)]' : 'bg-white/5 text-slate-400 hover:text-white'
                             }`}
                         title="Prompt 设置"
                     >
@@ -368,8 +368,8 @@ const PolishWorkspace: React.FC = () => {
                             onClick={handleStartPolish}
                             disabled={isProcessing}
                             className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-all ${isProcessing
-                                ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
-                                : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg hover:shadow-purple-500/25'
+                                ? 'bg-white/5 text-slate-400 cursor-not-allowed'
+                                : 'bg-gradient-to-r from-[var(--gpsx-accent-secondary)] to-[var(--gpsx-accent-primary)] text-black hover:shadow-lg hover:shadow-[var(--gpsx-accent-primary)]/20'
                                 }`}
                         >
                             {isProcessing ? (
@@ -388,7 +388,7 @@ const PolishWorkspace: React.FC = () => {
                         <button
                             onClick={handleRepolishAll}
                             disabled={isProcessing}
-                            className="px-4 py-2 bg-slate-700 text-white rounded-lg font-medium flex items-center gap-2 hover:bg-slate-600 transition-colors"
+                            className="px-4 py-2 bg-white/5 text-white rounded-lg font-medium flex items-center gap-2 hover:bg-white/10 transition-colors"
                         >
                             <RefreshCw size={18} />
                             全部重新润色
@@ -398,7 +398,7 @@ const PolishWorkspace: React.FC = () => {
                     {/* Export */}
                     <button
                         onClick={handleExport}
-                        className="px-4 py-2 bg-amber-500 text-black rounded-lg font-medium hover:bg-amber-400 transition-colors flex items-center gap-2"
+                        className="px-4 py-2 bg-[var(--gpsx-accent-primary)] text-black rounded-lg font-medium hover:bg-white transition-colors flex items-center gap-2 shadow-[0_0_15px_rgba(0,255,136,0.2)]"
                     >
                         <Download size={18} />
                         导出
@@ -408,14 +408,14 @@ const PolishWorkspace: React.FC = () => {
 
             {/* Prompt Config Panel */}
             {showPromptPanel && (
-                <div className="px-6 py-4 border-b border-slate-800 bg-slate-900/50 space-y-4">
+                <div className="px-6 py-4 border-b border-white/5 bg-[var(--gpsx-bg-card)]/50 space-y-4">
                     {/* Row 1: Template Selector (Full Width) */}
                     <div className="flex items-center gap-4">
                         <div className="flex-1">
                             <label className="block text-sm text-slate-400 mb-2 flex items-center gap-2">
                                 🎯 Prompt 模板预设
                                 {selectedTemplate && (
-                                    <span className="text-xs px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded-full">
+                                    <span className="text-xs px-2 py-0.5 bg-[var(--gpsx-accent-secondary)]/20 text-[var(--gpsx-accent-secondary)] rounded-full">
                                         当前: {selectedTemplate.name}
                                     </span>
                                 )}
@@ -423,7 +423,7 @@ const PolishWorkspace: React.FC = () => {
                             <select
                                 value={selectedTemplateId}
                                 onChange={(e) => setSelectedTemplateId(e.target.value)}
-                                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                className="w-full px-4 py-3 bg-[var(--gpsx-bg-main)] border border-white/5 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--gpsx-accent-secondary)]"
                             >
                                 {templates.length === 0 ? (
                                     <option value="">加载中...</option>
@@ -441,8 +441,8 @@ const PolishWorkspace: React.FC = () => {
                         <button
                             onClick={() => setShowTemplatePreview(!showTemplatePreview)}
                             className={`px-3 py-3 rounded-lg text-sm font-medium transition-colors ${showTemplatePreview
-                                ? 'bg-purple-500/20 text-purple-400 border border-purple-500'
-                                : 'bg-slate-800 text-slate-400 border border-slate-700 hover:text-white'
+                                ? 'bg-[var(--gpsx-accent-secondary)]/20 text-[var(--gpsx-accent-secondary)] border border-[var(--gpsx-accent-secondary)]'
+                                : 'bg-[var(--gpsx-bg-main)] text-slate-400 border border-white/5 hover:text-white'
                                 }`}
                         >
                             {showTemplatePreview ? '隐藏 Prompt' : '预览 Prompt'}
@@ -451,7 +451,7 @@ const PolishWorkspace: React.FC = () => {
 
                     {/* Template Prompt Preview */}
                     {showTemplatePreview && selectedTemplate && (
-                        <div className="p-4 bg-slate-950 border border-slate-700 rounded-xl">
+                        <div className="p-4 bg-[var(--gpsx-bg-main)] border border-white/5 rounded-xl">
                             <p className="text-xs text-slate-500 mb-2 uppercase tracking-wide">模板核心 Prompt</p>
                             <pre className="text-slate-300 text-sm whitespace-pre-wrap font-mono leading-relaxed max-h-40 overflow-y-auto">
                                 {selectedTemplate.prompt}
@@ -467,7 +467,7 @@ const PolishWorkspace: React.FC = () => {
                             <select
                                 value={selectedModel}
                                 onChange={(e) => setSelectedModel(e.target.value as 'deepseek' | 'gemini')}
-                                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-purple-500"
+                                className="w-full px-3 py-2 bg-[var(--gpsx-bg-main)] border border-white/5 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-[var(--gpsx-accent-secondary)]"
                             >
                                 <option value="deepseek">DeepSeek (5 Keys)</option>
                                 <option value="gemini">Gemini Flash</option>
@@ -480,7 +480,7 @@ const PolishWorkspace: React.FC = () => {
                             <select
                                 value={promptConfig.tone}
                                 onChange={(e) => setPromptConfig(prev => ({ ...prev, tone: e.target.value }))}
-                                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-purple-500"
+                                className="w-full px-3 py-2 bg-[var(--gpsx-bg-main)] border border-white/5 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-[var(--gpsx-accent-secondary)]"
                             >
                                 <option value="专业">专业正式</option>
                                 <option value="口语">口语化</option>
@@ -506,8 +506,8 @@ const PolishWorkspace: React.FC = () => {
                                         }));
                                     }}
                                     className={`px-3 py-1.5 text-xs rounded-full transition-colors ${promptConfig.cleaningRules.includes(rule)
-                                        ? 'bg-purple-500/30 text-purple-300 border border-purple-500'
-                                        : 'bg-slate-800 text-slate-400 border border-slate-700'
+                                        ? 'bg-[var(--gpsx-accent-secondary)]/30 text-[var(--gpsx-accent-secondary)] border border-[var(--gpsx-accent-secondary)]'
+                                        : 'bg-[var(--gpsx-bg-main)] text-slate-400 border border-white/5'
                                         }`}
                                 >
                                     {rule}
@@ -525,7 +525,7 @@ const PolishWorkspace: React.FC = () => {
                             value={promptConfig.customInstructions}
                             onChange={(e) => setPromptConfig(prev => ({ ...prev, customInstructions: e.target.value }))}
                             placeholder="例如：保留所有数字、保留「胖猫」这个专有名词、这是一段讲述心理学的内容..."
-                            className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm h-20 resize-none focus:outline-none focus:ring-1 focus:ring-purple-500 placeholder-slate-600"
+                            className="w-full px-4 py-3 bg-[var(--gpsx-bg-main)] border border-white/5 rounded-lg text-white text-sm h-20 resize-none focus:outline-none focus:ring-1 focus:ring-[var(--gpsx-accent-secondary)] placeholder-slate-600"
                         />
                     </div>
                 </div>
@@ -534,8 +534,8 @@ const PolishWorkspace: React.FC = () => {
             {/* Main Content */}
             <div className="flex-1 flex overflow-hidden">
                 {/* Chunk List - Raw Text */}
-                <div className="w-1/2 border-r border-slate-800 flex flex-col">
-                    <div className="px-4 py-3 border-b border-slate-800 bg-slate-900/50">
+                <div className="w-1/2 border-r border-white/5 flex flex-col">
+                    <div className="px-4 py-3 border-b border-white/5 bg-[var(--gpsx-bg-card)]/30">
                         <h2 className="text-sm font-bold text-slate-300">原始文本</h2>
                         <p className="text-xs text-slate-500">点击分块查看详情</p>
                     </div>
@@ -548,12 +548,12 @@ const PolishWorkspace: React.FC = () => {
                                     key={chunk.id}
                                     onClick={() => setSelectedChunk(chunk.id)}
                                     className={`p-4 rounded-xl border cursor-pointer transition-all ${selectedChunk === chunk.id
-                                        ? 'border-amber-500 bg-amber-500/10'
-                                        : 'border-slate-700 bg-slate-800/50 hover:border-slate-600'
+                                        ? 'border-[var(--gpsx-accent-primary)] bg-[var(--gpsx-accent-primary)]/10'
+                                        : 'border-white/5 bg-white/[0.02] hover:border-white/20'
                                         }`}
                                 >
                                     <div className="flex items-center justify-between mb-2">
-                                        <span className="text-xs font-bold text-amber-500">#{chunk.index}</span>
+                                        <span className="text-xs font-bold text-[var(--gpsx-accent-primary)]">#{chunk.index}</span>
                                         <span className="text-xs text-slate-500">{chunk.rawText.length} 字</span>
                                     </div>
                                     <p className="text-sm text-slate-300 line-clamp-3">{chunk.rawText}</p>
@@ -565,7 +565,7 @@ const PolishWorkspace: React.FC = () => {
 
                 {/* Polished Result */}
                 <div className="w-1/2 flex flex-col">
-                    <div className="px-4 py-3 border-b border-slate-800 bg-slate-900/50">
+                    <div className="px-4 py-3 border-b border-white/5 bg-[var(--gpsx-bg-card)]/30">
                         <h2 className="text-sm font-bold text-slate-300">润色结果</h2>
                         <p className="text-xs text-slate-500">DeepSeek 润色后</p>
                     </div>
@@ -577,15 +577,15 @@ const PolishWorkspace: React.FC = () => {
                                 <div
                                     key={chunk.id}
                                     className={`p-4 rounded-xl border transition-all ${selectedChunk === chunk.id
-                                        ? 'border-purple-500 bg-purple-500/10'
-                                        : 'border-slate-700 bg-slate-800/50'
+                                        ? 'border-[var(--gpsx-accent-secondary)] bg-[var(--gpsx-accent-secondary)]/10'
+                                        : 'border-white/5 bg-white/[0.02]'
                                         }`}
                                 >
                                     <div className="flex items-center justify-between mb-2">
-                                        <span className="text-xs font-bold text-purple-400">#{chunk.index}</span>
+                                        <span className="text-xs font-bold text-[var(--gpsx-accent-secondary)]">#{chunk.index}</span>
                                         <div className="flex items-center gap-2">
                                             {chunk.status === 'processing' && (
-                                                <span className="flex items-center gap-1 text-xs text-blue-400">
+                                                <span className="flex items-center gap-1 text-xs text-[var(--gpsx-accent-secondary)]">
                                                     <Loader2 size={12} className="animate-spin" />
                                                     处理中
                                                 </span>
@@ -594,7 +594,7 @@ const PolishWorkspace: React.FC = () => {
                                                 <>
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); handleRepolishChunk(chunk.id); }}
-                                                        className="text-slate-400 hover:text-purple-400 transition-colors"
+                                                        className="text-slate-400 hover:text-[var(--gpsx-accent-secondary)] transition-colors"
                                                         title="重新润色"
                                                     >
                                                         <RefreshCw size={14} />
@@ -610,7 +610,7 @@ const PolishWorkspace: React.FC = () => {
                                             {chunk.status === 'pending' && (
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); handlePolishChunk(chunk.id); }}
-                                                    className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded hover:bg-purple-500/30 transition-colors"
+                                                    className="text-xs px-2 py-1 bg-[var(--gpsx-accent-secondary)]/20 text-[var(--gpsx-accent-secondary)] rounded hover:bg-[var(--gpsx-accent-secondary)]/30 transition-colors"
                                                 >
                                                     润色
                                                 </button>

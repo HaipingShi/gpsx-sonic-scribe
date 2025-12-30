@@ -163,16 +163,16 @@ const SettingsPage: React.FC = () => {
     }
 
     return (
-        <div className="p-8 space-y-12 max-w-7xl mx-auto font-mono bg-black min-h-screen">
+        <div className="p-8 space-y-12 max-w-7xl mx-auto font-mono bg-[var(--gpsx-bg-main)] min-h-screen">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-black text-white flex items-center gap-4 uppercase tracking-widest">
-                        <Settings className="text-[#00ff88] gpsx-glow" size={32} />
+                        <Settings className="text-[var(--gpsx-accent-primary)] gpsx-glow" size={32} />
                         系统控制中心
                     </h1>
                     <p className="text-slate-400 mt-2 flex items-center gap-2 text-sm font-bold uppercase tracking-widest">
-                        <span className="text-[#00ff88]/40">//</span>
+                        <span className="text-[var(--gpsx-accent-primary)]/40">//</span>
                         协议管理: [ 核心配置 / 密钥库 / AI模板 ]
                     </p>
                 </div>
@@ -181,7 +181,7 @@ const SettingsPage: React.FC = () => {
                     disabled={saveStatus === 'saving'}
                     className={cn(
                         "gpsx-button px-10 py-3",
-                        saveStatus === 'saved' && "bg-[#00ff88] text-black border-[#00ff88] shadow-[0_0_20px_rgba(0,255,136,0.3)]",
+                        saveStatus === 'saved' && "bg-[var(--gpsx-accent-primary)] text-black border-[var(--gpsx-accent-primary)] shadow-[0_0_20px_rgba(0,255,136,0.3)]",
                         saveStatus === 'error' && "bg-red-500 text-white border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]"
                     )}
                 >
@@ -202,14 +202,14 @@ const SettingsPage: React.FC = () => {
                 {/* Column 1 */}
                 <div className="space-y-10">
                     {/* API Configuration */}
-                    <div className="bg-[#050505] border border-white/5 p-8 space-y-8 relative overflow-hidden group">
+                    <div className="bg-[var(--gpsx-bg-card)] border border-white/5 p-8 space-y-8 relative overflow-hidden group">
                         <div className="gpsx-scanline opacity-5 pointer-events-none"></div>
                         <div className="flex items-center justify-between">
                             <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                <Key size={18} className="text-[#00ff88] group-hover:gpsx-glow transition-all" />
+                                <Key size={18} className="text-[var(--gpsx-accent-secondary)] group-hover:gpsx-glow transition-all" />
                                 接口授权管理
                             </h2>
-                            <span className="px-2 py-0.5 border border-[#00ff88]/20 text-[#00ff88] text-[11px] font-black uppercase tracking-widest">加密库</span>
+                            <span className="px-2 py-0.5 border border-[var(--gpsx-accent-secondary)]/20 text-[var(--gpsx-accent-secondary)] text-[11px] font-black uppercase tracking-widest">加密库</span>
                         </div>
 
                         <div className="space-y-6">
@@ -220,7 +220,7 @@ const SettingsPage: React.FC = () => {
                                         type="password"
                                         value={settings.aliyunApiKey || ''}
                                         onChange={(e) => setSettings(s => ({ ...s, aliyunApiKey: e.target.value }))}
-                                        className="w-full p-4 bg-black border border-white/5 text-white focus:border-[#00ff88]/40 outline-none transition-all font-mono text-xs uppercase"
+                                        className="w-full p-4 bg-[var(--gpsx-bg-main)] border border-white/5 text-white focus:border-[var(--gpsx-accent-primary)]/40 outline-none transition-all font-mono text-xs uppercase"
                                         placeholder="sk-****************"
                                     />
                                 </div>
@@ -229,7 +229,7 @@ const SettingsPage: React.FC = () => {
                             <div className="space-y-4 pt-2">
                                 <div className="flex items-center justify-between">
                                     <label className="block text-slate-400 text-[12px] font-black mb-1 uppercase tracking-widest">[02] DeepSeek 文本精炼负载均衡密钥池</label>
-                                    <button onClick={addKey} className="text-[12px] text-[#00ff88] hover:text-white font-black flex items-center gap-1 transition-colors uppercase tracking-widest">
+                                    <button onClick={addKey} className="text-[12px] text-[var(--gpsx-accent-primary)] hover:text-white font-black flex items-center gap-1 transition-colors uppercase tracking-widest">
                                         <Plus size={12} /> 添加节点
                                     </button>
                                 </div>
@@ -240,7 +240,7 @@ const SettingsPage: React.FC = () => {
                                                 type="password"
                                                 value={key}
                                                 onChange={(e) => updateKey(i, e.target.value)}
-                                                className="flex-1 p-4 bg-black border border-white/5 text-white focus:border-blue-500/40 outline-none transition-all font-mono text-sm"
+                                                className="flex-1 p-4 bg-[var(--gpsx-bg-main)] border border-white/5 text-white focus:border-blue-500/40 outline-none transition-all font-mono text-sm"
                                                 placeholder={`节点_${String(i + 1).padStart(2, '0')}`}
                                             />
                                             <button
@@ -258,7 +258,7 @@ const SettingsPage: React.FC = () => {
                     </div>
 
                     {/* Hotwords Manager */}
-                    <div className="bg-[#050505] border border-white/5 p-8 space-y-6 relative overflow-hidden group">
+                    <div className="bg-[var(--gpsx-bg-card)] border border-white/5 p-8 space-y-6 relative overflow-hidden group">
                         <div className="gpsx-scanline opacity-5 pointer-events-none"></div>
                         <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                             <Hash size={18} className="text-amber-500 group-hover:gpsx-glow" />
@@ -266,7 +266,7 @@ const SettingsPage: React.FC = () => {
                         </h2>
                         <p className="text-slate-400 text-[12px] font-bold uppercase tracking-widest leading-loose">受保护的专有名词数据库，确保在AI自动化清洗过程中保持专业准确性。</p>
 
-                        <div className="bg-black border border-white/5 p-6 min-h-[140px] flex flex-wrap gap-3 content-start">
+                        <div className="bg-[var(--gpsx-bg-main)] border border-white/5 p-6 min-h-[140px] flex flex-wrap gap-3 content-start">
                             {(settings.hotwords || []).map((word, i) => (
                                 <span key={i} className="px-3 py-1.5 bg-amber-500/5 border border-amber-500/20 text-amber-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-3 group/tag hover:border-amber-400 transition-all">
                                     {word}
@@ -285,11 +285,11 @@ const SettingsPage: React.FC = () => {
                                 onChange={(e) => setNewHotword(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && addHotword()}
                                 placeholder="输入术语标识符..."
-                                className="flex-1 p-4 bg-black border-none text-white outline-none focus:ring-0 text-sm uppercase tracking-widest"
+                                className="flex-1 p-4 bg-[var(--gpsx-bg-main)] border-none text-white outline-none focus:ring-0 text-sm uppercase tracking-widest"
                             />
                             <button
                                 onClick={addHotword}
-                                className="px-8 bg-[#00ff88] text-black font-black text-[12px] uppercase tracking-widest hover:bg-white transition-all shadow-[inset_0_0_10px_rgba(0,0,0,0.1)]"
+                                className="px-8 bg-[var(--gpsx-accent-primary)] text-black font-black text-[12px] uppercase tracking-widest hover:bg-white transition-all shadow-[inset_0_0_10px_rgba(0,0,0,0.1)]"
                             >
                                 注入资产
                             </button>
@@ -300,7 +300,7 @@ const SettingsPage: React.FC = () => {
                 {/* Column 2 */}
                 <div className="space-y-10">
                     {/* Processing Defaults */}
-                    <div className="bg-[#050505] border border-white/5 p-8 space-y-10 relative overflow-hidden group">
+                    <div className="bg-[var(--gpsx-bg-card)] border border-white/5 p-8 space-y-10 relative overflow-hidden group">
                         <div className="gpsx-scanline opacity-5 pointer-events-none"></div>
                         <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                             <Cpu size={18} className="text-blue-500 group-hover:gpsx-glow" />
@@ -312,7 +312,7 @@ const SettingsPage: React.FC = () => {
                             <select
                                 value={settings.defaultLanguage || 'auto'}
                                 onChange={(e) => setSettings(s => ({ ...s, defaultLanguage: e.target.value }))}
-                                className="w-full p-4 bg-black border border-white/5 text-white outline-none cursor-pointer text-sm font-black uppercase tracking-widest focus:border-blue-500/40"
+                                className="w-full p-4 bg-[var(--gpsx-bg-main)] border border-white/5 text-white outline-none cursor-pointer text-sm font-black uppercase tracking-widest focus:border-blue-500/40"
                             >
                                 <option value="auto">智能探测分析</option>
                                 <option value="zh">简体中文</option>
@@ -325,17 +325,17 @@ const SettingsPage: React.FC = () => {
                                 onClick={() => setSettings(s => ({ ...s, autoPolish: !s.autoPolish }))}
                                 className={cn(
                                     "p-6 border flex items-center justify-between cursor-pointer transition-all uppercase tracking-widest",
-                                    settings.autoPolish ? 'bg-[#00ff88]/5 border-[#00ff88]/20' : 'bg-black border-white/5'
+                                    settings.autoPolish ? 'bg-[var(--gpsx-accent-primary)]/5 border-[var(--gpsx-accent-primary)]/20' : 'bg-[var(--gpsx-bg-main)] border-white/5'
                                 )}
                             >
                                 <div>
-                                    <p className={cn("text-[12px] font-black transition-colors", settings.autoPolish ? "text-[#00ff88]" : "text-white")}>
+                                    <p className={cn("text-[12px] font-black transition-colors", settings.autoPolish ? "text-[var(--gpsx-accent-primary)]" : "text-white")}>
                                         即时开启 AI 文本精炼工作流
                                     </p>
                                     <p className="text-slate-500 text-[11px] mt-1 font-bold">在语音转写完成后自动触发 AI 精炼引擎</p>
                                 </div>
-                                <div className={cn("w-10 h-5 border transition-all relative", settings.autoPolish ? 'border-[#00ff88]' : 'border-slate-700')}>
-                                    <div className={cn("absolute top-0.5 h-3.5 w-3.5 transition-all", settings.autoPolish ? 'left-5.5 bg-[#00ff88]' : 'left-0.5 bg-slate-700')} />
+                                <div className={cn("w-10 h-5 border transition-all relative", settings.autoPolish ? 'border-[var(--gpsx-accent-primary)]' : 'border-slate-700')}>
+                                    <div className={cn("absolute top-0.5 h-3.5 w-3.5 transition-all", settings.autoPolish ? 'left-5.5 bg-[var(--gpsx-accent-primary)]' : 'left-0.5 bg-slate-700')} />
                                 </div>
                             </div>
 
@@ -344,7 +344,7 @@ const SettingsPage: React.FC = () => {
                                 <select
                                     value={settings.defaultTemplateId || 'professional'}
                                     onChange={(e) => setSettings(s => ({ ...s, defaultTemplateId: e.target.value }))}
-                                    className="w-full p-4 bg-black border border-white/5 text-white outline-none cursor-pointer text-sm font-black uppercase tracking-widest focus:border-[#00ff88]/40"
+                                    className="w-full p-4 bg-[var(--gpsx-bg-main)] border border-white/5 text-white outline-none cursor-pointer text-sm font-black uppercase tracking-widest focus:border-[var(--gpsx-accent-primary)]/40"
                                 >
                                     {(settings.promptTemplates || []).map(tpl => (
                                         <option key={tpl.id} value={tpl.id}>
@@ -359,7 +359,7 @@ const SettingsPage: React.FC = () => {
                                 <select
                                     value={settings.defaultPolishModel || 'gemini'}
                                     onChange={(e) => setSettings(s => ({ ...s, defaultPolishModel: e.target.value as 'deepseek' | 'gemini' }))}
-                                    className="w-full p-4 bg-black border border-white/5 text-white outline-none cursor-pointer text-sm font-black uppercase tracking-widest focus:border-blue-500/40"
+                                    className="w-full p-4 bg-[var(--gpsx-bg-main)] border border-white/5 text-white outline-none cursor-pointer text-sm font-black uppercase tracking-widest focus:border-blue-500/40"
                                 >
                                     <option value="gemini">Google Gemini 3 Flash (核心方案)</option>
                                     <option value="deepseek">DeepSeek V3 高速集群 (备选方案)</option>
@@ -369,16 +369,16 @@ const SettingsPage: React.FC = () => {
                     </div>
 
                     {/* Prompt Template Customizer */}
-                    <div className="bg-[#050505] border border-white/5 p-8 space-y-8 relative overflow-hidden group">
+                    <div className="bg-[var(--gpsx-bg-card)] border border-white/5 p-8 space-y-8 relative overflow-hidden group">
                         <div className="gpsx-scanline opacity-5 pointer-events-none"></div>
                         <div className="flex items-center justify-between">
                             <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                <MessageSquare size={18} className="text-[#00ff88] group-hover:gpsx-glow" />
+                                <MessageSquare size={18} className="text-[var(--gpsx-accent-primary)] group-hover:gpsx-glow" />
                                 AI 精炼模板预设
                             </h2>
                             <button
                                 onClick={createNewTemplate}
-                                className="text-[12px] text-[#00ff88] hover:text-white font-black flex items-center gap-1 transition-colors uppercase tracking-widest"
+                                className="text-[12px] text-[var(--gpsx-accent-primary)] hover:text-white font-black flex items-center gap-1 transition-colors uppercase tracking-widest"
                             >
                                 <Plus size={12} /> 创建新方案
                             </button>
@@ -386,18 +386,18 @@ const SettingsPage: React.FC = () => {
 
                         <div className="grid grid-cols-1 gap-4">
                             {(settings.promptTemplates || []).map((tpl) => (
-                                <div key={tpl.id} className="p-6 bg-black border border-white/5 group/tpl hover:border-[#00ff88]/30 transition-all flex items-center justify-between">
+                                <div key={tpl.id} className="p-6 bg-[var(--gpsx-bg-main)] border border-white/5 group/tpl hover:border-[var(--gpsx-accent-primary)]/30 transition-all flex items-center justify-between">
                                     <div className="flex-1 min-w-0 pr-4">
                                         <div className="flex items-center gap-3 mb-1">
                                             <span className="text-white text-[12px] font-black uppercase tracking-widest">{tpl.name}</span>
-                                            {tpl.isSystem && <span className="text-[11px] border border-[#00ff88]/20 text-[#00ff88] px-1 font-black">系统核心</span>}
+                                            {tpl.isSystem && <span className="text-[11px] border border-[var(--gpsx-accent-primary)]/20 text-[var(--gpsx-accent-primary)] px-1 font-black">系统核心</span>}
                                         </div>
                                         <p className="text-slate-500 text-[11px] font-bold uppercase tracking-widest truncate">{tpl.description}</p>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={() => openTemplateEditor(tpl)}
-                                            className="px-4 py-2 border border-white/5 text-slate-400 hover:text-[#00ff88] hover:border-[#00ff88]/30 text-[12px] font-black uppercase tracking-widest transition-all"
+                                            className="px-4 py-2 border border-white/5 text-slate-400 hover:text-[var(--gpsx-accent-primary)] hover:border-[var(--gpsx-accent-primary)]/30 text-[12px] font-black uppercase tracking-widest transition-all"
                                         >
                                             调整方案
                                         </button>
@@ -421,11 +421,11 @@ const SettingsPage: React.FC = () => {
             {/* Template Editor Modal Overlay */}
             {editingTemplate && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-8 bg-black/95 backdrop-blur-md animate-in fade-in duration-300">
-                    <div className="bg-[#050505] border border-white/10 w-full max-w-4xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] animate-in zoom-in-95 duration-300">
-                        <div className="p-8 border-b border-white/5 flex items-center justify-between bg-black">
+                    <div className="bg-[var(--gpsx-bg-card)] border border-white/10 w-full max-w-4xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] animate-in zoom-in-95 duration-300">
+                        <div className="p-8 border-b border-white/5 flex items-center justify-between bg-[var(--gpsx-bg-main)]">
                             <div>
                                 <h3 className="text-lg font-black text-white flex items-center gap-3 uppercase tracking-widest">
-                                    <Edit3 size={20} className="text-[#00ff88]" />
+                                    <Edit3 size={20} className="text-[var(--gpsx-accent-primary)]" />
                                     配置 AI 精炼方案: {editingTemplate.name}
                                 </h3>
                                 <p className="text-slate-500 text-[11px] mt-2 font-bold uppercase tracking-widest">覆盖当前的神经网络处理逻辑参数</p>
@@ -441,7 +441,7 @@ const SettingsPage: React.FC = () => {
                                     type="text"
                                     value={editingName}
                                     onChange={(e) => setEditingName(e.target.value)}
-                                    className="w-full p-4 bg-black border border-white/5 text-white text-sm font-black uppercase tracking-widest outline-none focus:border-[#00ff88]/40"
+                                    className="w-full p-4 bg-[var(--gpsx-bg-main)] border border-white/5 text-white text-sm font-black uppercase tracking-widest outline-none focus:border-[var(--gpsx-accent-primary)]/40"
                                 />
                             </div>
                             <div>
@@ -452,11 +452,11 @@ const SettingsPage: React.FC = () => {
                                 <textarea
                                     value={editingPrompt}
                                     onChange={(e) => setEditingPrompt(e.target.value)}
-                                    className="w-full h-96 p-6 bg-black border border-white/5 text-white font-mono text-sm leading-relaxed resize-none focus:border-[#00ff88]/40 outline-none scrollbar-thin scrollbar-thumb-white/5"
+                                    className="w-full h-96 p-6 bg-[var(--gpsx-bg-main)] border border-white/5 text-white font-mono text-sm leading-relaxed resize-none focus:border-[var(--gpsx-accent-primary)]/40 outline-none scrollbar-thin scrollbar-thumb-white/5"
                                 />
                             </div>
                         </div>
-                        <div className="p-8 bg-black border-t border-white/5 flex justify-end gap-6">
+                        <div className="p-8 bg-[var(--gpsx-bg-main)] border-t border-white/5 flex justify-end gap-6">
                             <button
                                 onClick={() => setEditingTemplate(null)}
                                 className="px-8 py-3 text-slate-500 hover:text-white text-[12px] font-black uppercase tracking-widest transition-all"

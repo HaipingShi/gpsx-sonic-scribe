@@ -4,57 +4,91 @@
 
 @layer base {
     :root {
-        --gpsx-green: #00ff88;
-        --gpsx-green-glow: rgba(0, 255, 136, 0.4);
-        --gpsx-black: #000000;
-        --gpsx-slate: #0a0a0a;
-        --gpsx-border: #1a1a1a;
+        /* Default / Matrix Green Palette */
+        --gpsx-accent-primary: #00ff88;
+        --gpsx-accent-secondary: #00ff88;
+        --gpsx-accent-glow: rgba(0, 255, 136, 0.4);
+        --gpsx-bg-main: #000000;
+        --gpsx-bg-card: #050505;
+        --gpsx-border: rgba(255, 255, 255, 0.05);
+        --gpsx-text-main: #e2e8f0;
+        --gpsx-text-muted: #94a3b8;
+        --gpsx-text-accent: #00ff88;
+    }
+
+    [data-theme='midnight'] {
+        /* Midnight Cyber Palette */
+        --gpsx-accent-primary: #00ff88; /* Neon Green stays for primary actions */
+        --gpsx-accent-secondary: #a855f7; /* Neon Purple for specific labels/highlights */
+        --gpsx-accent-glow: rgba(168, 85, 247, 0.4);
+        --gpsx-bg-main: #0b0f19; /* Deep Midnight Blue */
+        --gpsx-bg-card: #111827; /* Slightly lighter blue-gray */
+        --gpsx-border: rgba(255, 255, 255, 0.08);
+        --gpsx-text-main: #f1f5f9;
+        --gpsx-text-muted: #64748b;
+        --gpsx-text-accent: #a855f7;
     }
 
     body {
-        @apply bg-black text-slate-200 antialiased;
+        background-color: var(--gpsx-bg-main);
+        color: var(--gpsx-text-main);
+        @apply antialiased;
         font-family: 'Inter', 'system-ui', sans-serif;
         font-size: 15px;
+        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
+    h1, h2, h3, h4, h5, h6 {
         @apply tracking-tighter uppercase font-bold text-white;
     }
 }
 
 @layer components {
     .gpsx-glow {
-        text-shadow: 0 0 10px var(--gpsx-green-glow), 0 0 20px var(--gpsx-green-glow);
+        text-shadow: 0 0 10px var(--gpsx-accent-glow), 0 0 20px var(--gpsx-accent-glow);
     }
 
     .gpsx-border {
-        @apply border border-[#00ff88]/20 hover:border-[#00ff88]/50 transition-all duration-300;
-        box-shadow: inset 0 0 10px rgba(0, 255, 136, 0.05);
+        border: 1px solid rgba(0, 255, 136, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    [data-theme='midnight'] .gpsx-border {
+        border-color: rgba(168, 85, 247, 0.2);
     }
 
     .gpsx-card {
-        @apply bg-[#050505] border border-white/5 rounded-none p-6;
+        background-color: var(--gpsx-bg-card);
+        border: 1px solid var(--gpsx-border);
+        @apply rounded-none p-6;
         background-image:
-            linear-gradient(rgba(0, 255, 136, 0.02) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 255, 136, 0.02) 1px, transparent 1px);
+            linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
         background-size: 20px 20px;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     .gpsx-button {
-        @apply px-4 py-2 bg-transparent border border-[#00ff88]/40 text-[#00ff88] hover:bg-[#00ff88]/10 hover:border-[#00ff88] transition-all duration-200 uppercase tracking-[0.1em] text-sm font-bold;
+        @apply px-4 py-2 bg-transparent border text-sm font-bold uppercase tracking-[0.1em] transition-all duration-200;
+        border-color: var(--gpsx-accent-primary);
+        color: var(--gpsx-accent-primary);
+    }
+    
+    .gpsx-button:hover {
+        background-color: rgba(0, 255, 136, 0.1);
+        border-color: var(--gpsx-accent-primary);
+    }
+
+    [data-theme='midnight'] .gpsx-button:hover {
+        background-color: rgba(168, 85, 247, 0.1);
     }
 
     .gpsx-scanline {
         width: 100%;
         height: 100px;
         z-index: 10;
-        background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(0, 255, 136, 0.02) 50%, rgba(0, 0, 0, 0) 100%);
-        opacity: 0.1;
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, var(--gpsx-accent-glow) 50%, rgba(0, 0, 0, 0) 100%);
+        opacity: 0.05;
         position: fixed;
         bottom: 100%;
         pointer-events: none;
@@ -63,13 +97,8 @@
 }
 
 @keyframes scanline {
-    0% {
-        bottom: 100%;
-    }
-
-    100% {
-        bottom: -100px;
-    }
+    0% { bottom: 100%; }
+    100% { bottom: -100px; }
 }
 
 /* Scrollbar styling */
@@ -78,9 +107,13 @@
 }
 
 ::-webkit-scrollbar-track {
-    @apply bg-black;
+    background-color: var(--gpsx-bg-main);
 }
 
 ::-webkit-scrollbar-thumb {
-    @apply bg-[#1a1a1a] hover:bg-[#00ff88]/50 transition-all;
+    background-color: var(--gpsx-border);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--gpsx-accent-primary);
 }

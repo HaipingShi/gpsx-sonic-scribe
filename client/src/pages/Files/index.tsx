@@ -133,9 +133,9 @@ const FilesPage: React.FC = () => {
             'UPLOADED': { label: '已上传', color: 'text-slate-400 border-white/10' },
             'TRANSCRIBING': { label: '转写中', color: 'text-blue-400 border-blue-500/20 animate-pulse' },
             'TRANSCRIBED': { label: '原始数据', color: 'text-blue-400 border-blue-500/10' },
-            'POLISHING': { label: '精炼中', color: 'text-[#00ff88] border-[#00ff88]/20 animate-pulse' },
-            'POLISHED': { label: '已精炼资产', color: 'text-[#00ff88] border-[#00ff88]/30' },
-            'COMPLETED': { label: '已归档', color: 'text-[#00ff88] border-[#00ff88]/30' },
+            'POLISHING': { label: '精炼中', color: 'text-[var(--gpsx-accent-primary)] border-[var(--gpsx-accent-primary)]/20 animate-pulse' },
+            'POLISHED': { label: '已精炼资产', color: 'text-[var(--gpsx-accent-primary)] border-[var(--gpsx-accent-primary)]/30' },
+            'COMPLETED': { label: '已归档', color: 'text-[var(--gpsx-accent-primary)] border-[var(--gpsx-accent-primary)]/30' },
             'FAILED': { label: '执行失败', color: 'text-red-500 border-red-500/30' },
         };
         return statusMap[status] || { label: status, color: 'text-slate-500 border-white/10' };
@@ -154,16 +154,16 @@ const FilesPage: React.FC = () => {
     };
 
     return (
-        <div className="p-8 space-y-8 font-mono bg-black min-h-screen">
+        <div className="p-8 space-y-8 font-mono bg-[var(--gpsx-bg-main)] min-h-screen">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-black text-white flex items-center gap-4 uppercase tracking-widest">
-                        <FolderOpen className="text-[#00ff88] gpsx-glow" size={32} />
+                        <FolderOpen className="text-[var(--gpsx-accent-primary)] gpsx-glow" size={32} />
                         档案库管理系统
                     </h1>
                     <p className="text-slate-400 mt-2 flex items-center gap-2 text-sm font-bold uppercase tracking-widest">
-                        <span className="text-[#00ff88]/40">//</span>
+                        <span className="text-[var(--gpsx-accent-primary)]/40">//</span>
                         数据流浏览器就绪: 已检索到 [ {projects.length} ] 条记录
                     </p>
                 </div>
@@ -182,14 +182,14 @@ const FilesPage: React.FC = () => {
                 {/* Search */}
                 <div className="relative flex-1 min-w-64">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <span className="text-[#00ff88] text-xs font-black">&gt;</span>
+                        <span className="text-[var(--gpsx-accent-primary)] text-xs font-black">&gt;</span>
                     </div>
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="在档案数据流中搜索..."
-                        className="w-full pl-10 pr-4 py-3 bg-[#0a0a0a] border border-white/5 text-white placeholder-slate-600 focus:outline-none focus:border-[#00ff88]/40 transition-all font-mono text-base uppercase tracking-widest"
+                        className="w-full pl-10 pr-4 py-3 bg-[var(--gpsx-bg-main)] border border-white/5 text-white placeholder-slate-600 focus:outline-none focus:border-[var(--gpsx-accent-primary)]/40 transition-all font-mono text-base uppercase tracking-widest"
                     />
                 </div>
 
@@ -206,7 +206,7 @@ const FilesPage: React.FC = () => {
                             className={cn(
                                 'px-6 py-3 text-[12px] font-black tracking-widest transition-all',
                                 filter === f.id
-                                    ? 'bg-[#00ff88] text-black'
+                                    ? 'bg-[var(--gpsx-accent-primary)] text-black'
                                     : 'text-slate-400 hover:text-white hover:bg-white/5'
                             )}
                         >
@@ -217,15 +217,15 @@ const FilesPage: React.FC = () => {
 
                 {/* Batch Actions */}
                 {selectedFiles.length > 0 && (
-                    <div className="flex items-center gap-4 px-4 py-2 bg-[#00ff88]/5 border border-[#00ff88]/20 animate-in fade-in slide-in-from-right-4">
-                        <span className="text-[#00ff88] text-[12px] font-black uppercase tracking-widest">
+                    <div className="flex items-center gap-4 px-4 py-2 bg-[var(--gpsx-accent-primary)]/5 border border-[var(--gpsx-accent-primary)]/20 animate-in fade-in slide-in-from-right-4">
+                        <span className="text-[var(--gpsx-accent-primary)] text-[12px] font-black uppercase tracking-widest">
                             已选缓冲区: {selectedFiles.length}
                         </span>
-                        <div className="h-4 w-[1px] bg-[#00ff88]/20"></div>
+                        <div className="h-4 w-[1px] bg-[var(--gpsx-accent-primary)]/20"></div>
                         <button
                             onClick={handleBatchDownload}
                             disabled={downloading}
-                            className="text-[#00ff88] hover:text-white text-[12px] font-black uppercase tracking-widest flex items-center gap-2 group transition-colors"
+                            className="text-[var(--gpsx-accent-primary)] hover:text-white text-[12px] font-black uppercase tracking-widest flex items-center gap-2 group transition-colors"
                         >
                             <Download size={14} className="group-hover:translate-y-0.5 transition-transform" />
                             {downloading ? '打包中...' : '打包下载'}
@@ -244,12 +244,12 @@ const FilesPage: React.FC = () => {
 
             {/* File Table */}
             {loading ? (
-                <div className="bg-[#050505] border border-white/5 p-20 text-center flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-2 border-t-[#00ff88] border-white/5 rounded-full animate-spin"></div>
-                    <p className="text-[#00ff88] text-[12px] font-black uppercase tracking-widest">正在查询数据库...</p>
+                <div className="bg-[var(--gpsx-bg-card)] border border-white/5 p-20 text-center flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-2 border-t-[var(--gpsx-accent-primary)] border-white/5 rounded-full animate-spin"></div>
+                    <p className="text-[var(--gpsx-accent-primary)] text-[12px] font-black uppercase tracking-widest">正在查询数据库...</p>
                 </div>
             ) : filteredProjects.length === 0 ? (
-                <div className="bg-[#050505] border border-white/5 p-20 text-center flex flex-col items-center gap-6">
+                <div className="bg-[var(--gpsx-bg-card)] border border-white/5 p-20 text-center flex flex-col items-center gap-6">
                     <div className="text-slate-800 font-black text-6xl">// 空</div>
                     <div className="space-y-2">
                         <p className="text-slate-400 text-[14px] font-black uppercase tracking-widest">未发现有效数据流</p>
@@ -257,19 +257,19 @@ const FilesPage: React.FC = () => {
                     </div>
                 </div>
             ) : (
-                <div className="bg-[#020202] border border-white/5 relative overflow-hidden group">
+                <div className="bg-[var(--gpsx-bg-main)] border border-white/5 relative overflow-hidden group">
                     <div className="gpsx-scanline opacity-10 pointer-events-none"></div>
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-white/5 bg-[#080808]">
+                            <tr className="border-b border-white/5 bg-[var(--gpsx-bg-card)]">
                                 <th className="w-16 px-6 py-6 text-center">
                                     <div
                                         onClick={selectAll}
                                         className={cn(
                                             'w-4 h-4 border mx-auto cursor-pointer transition-all flex items-center justify-center',
                                             selectedFiles.length === filteredProjects.length && filteredProjects.length > 0
-                                                ? 'bg-[#00ff88] border-[#00ff88]'
-                                                : 'border-white/20 hover:border-[#00ff88]/50'
+                                                ? 'bg-[var(--gpsx-accent-primary)] border-[var(--gpsx-accent-primary)]'
+                                                : 'border-white/20 hover:border-[var(--gpsx-accent-primary)]/50'
                                         )}
                                     >
                                         {selectedFiles.length === filteredProjects.length && filteredProjects.length > 0 && (
@@ -295,7 +295,7 @@ const FilesPage: React.FC = () => {
                                         key={project.id}
                                         className={cn(
                                             'border-b border-white/5 transition-colors group/row font-mono',
-                                            isSelected ? 'bg-[#00ff88]/5' : 'hover:bg-white/[0.02]',
+                                            isSelected ? 'bg-[var(--gpsx-accent-primary)]/5' : 'hover:bg-white/[0.02]',
                                             isDeleting && 'opacity-30'
                                         )}
                                     >
@@ -304,7 +304,7 @@ const FilesPage: React.FC = () => {
                                                 onClick={() => toggleSelect(project.id)}
                                                 className={cn(
                                                     'w-4 h-4 border mx-auto cursor-pointer transition-all flex items-center justify-center',
-                                                    isSelected ? 'bg-[#00ff88] border-[#00ff88]' : 'border-white/10 group-hover/row:border-white/30'
+                                                    isSelected ? 'bg-[var(--gpsx-accent-primary)] border-[var(--gpsx-accent-primary)]' : 'border-white/10 group-hover/row:border-white/30'
                                                 )}
                                             >
                                                 {isSelected && <div className="w-2 h-2 bg-black"></div>}
@@ -312,7 +312,7 @@ const FilesPage: React.FC = () => {
                                         </td>
                                         <td className="px-6 py-6">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 border border-white/5 flex items-center justify-center text-slate-600 group-hover/row:border-[#00ff88]/30 group-hover/row:text-[#00ff88] transition-all">
+                                                <div className="w-10 h-10 border border-white/5 flex items-center justify-center text-slate-600 group-hover/row:border-[var(--gpsx-accent-primary)]/30 group-hover/row:text-[var(--gpsx-accent-primary)] transition-all">
                                                     <FileAudio size={18} />
                                                 </div>
                                                 <div className="flex flex-col">
@@ -340,7 +340,7 @@ const FilesPage: React.FC = () => {
                                             <div className="flex items-center justify-end gap-3 opacity-20 group-hover/row:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => navigate(`/transcribe/${project.id}`)}
-                                                    className="p-2 border border-white/5 hover:border-[#00ff88]/50 hover:bg-[#00ff88]/10 text-[#00ff88] transition-all"
+                                                    className="p-2 border border-white/5 hover:border-[var(--gpsx-accent-primary)]/50 hover:bg-[var(--gpsx-accent-primary)]/10 text-[var(--gpsx-accent-primary)] transition-all"
                                                     title="VIEW_DATA"
                                                 >
                                                     <Eye size={16} />

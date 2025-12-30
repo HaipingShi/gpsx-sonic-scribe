@@ -51,20 +51,20 @@ const HistoryPage: React.FC = () => {
     };
 
     return (
-        <div className="p-10 space-y-10 font-mono bg-black min-h-screen">
+        <div className="p-10 space-y-10 font-mono bg-[var(--gpsx-bg-main)] min-h-screen">
             <div className="flex items-center justify-between border-b border-white/5 pb-8">
                 <div>
                     <h1 className="text-3xl font-black text-white flex items-center gap-4 uppercase tracking-[0.3em]">
-                        <Clock className="text-[#00ff88] w-8 h-8" />
+                        <Clock className="text-[var(--gpsx-accent-primary)] w-8 h-8" />
                         Archive_Access_Node
                     </h1>
                     <p className="text-slate-500 mt-2 font-bold uppercase tracking-widest flex items-center gap-2">
-                        <span className="w-2 h-2 bg-[#00ff88] animate-pulse rounded-full" />
+                        <span className="w-2 h-2 bg-[var(--gpsx-accent-primary)] animate-pulse rounded-full" />
                         QUERYING_HISTORICAL_NODES: [ COMPLETED / FAILED ]
                     </p>
                 </div>
                 <div className="flex items-center gap-6">
-                    <div className="flex gap-2 p-1 border border-white/5 bg-black">
+                    <div className="flex gap-2 p-1 border border-white/5 bg-[var(--gpsx-bg-main)]">
                         {[
                             { id: 'all', label: 'PROTOCOL_ALL' },
                             { id: 'completed', label: 'RESOLVED' },
@@ -87,20 +87,20 @@ const HistoryPage: React.FC = () => {
                     <button
                         onClick={loadProjects}
                         disabled={loading}
-                        className="group p-2 border border-white/5 hover:border-[#00ff88]/40 transition-all"
+                        className="group p-2 border border-white/5 hover:border-[var(--gpsx-accent-primary)]/40 transition-all"
                     >
-                        <RefreshCw size={18} className={cn("text-slate-500 group-hover:text-[#00ff88]", loading && 'animate-spin')} />
+                        <RefreshCw size={18} className={cn("text-slate-500 group-hover:text-[var(--gpsx-accent-primary)]", loading && 'animate-spin')} />
                     </button>
                 </div>
             </div>
 
             {loading ? (
                 <div className="flex flex-col items-center justify-center p-20">
-                    <Loader2 size={40} className="text-[#00ff88] animate-spin mb-6" />
-                    <p className="text-[#00ff88] text-[10px] font-black uppercase tracking-[0.4em]">Synching_Archive_Index...</p>
+                    <Loader2 size={40} className="text-[var(--gpsx-accent-primary)] animate-spin mb-6" />
+                    <p className="text-[var(--gpsx-accent-primary)] text-[10px] font-black uppercase tracking-[0.4em]">Synching_Archive_Index...</p>
                 </div>
             ) : filteredProjects.length === 0 ? (
-                <div className="border border-dashed border-white/10 bg-[#050505] p-24 text-center">
+                <div className="border border-dashed border-white/10 bg-[var(--gpsx-bg-card)] p-24 text-center">
                     <AlertCircle size={48} className="mx-auto text-slate-800 mb-6" />
                     <p className="text-slate-600 text-xs font-black uppercase tracking-[0.2em]">// NULL_STATE: NO_ARCHIVES_DETECTED</p>
                 </div>
@@ -110,11 +110,11 @@ const HistoryPage: React.FC = () => {
                         <div
                             key={project.id}
                             onClick={() => navigate(project.status !== 'FAILED' ? `/transcribe/${project.id}/merge` : `/transcribe/${project.id}`)}
-                            className="group flex items-center gap-6 p-6 bg-[#050505] border border-white/5 hover:border-[#00ff88]/40 transition-all cursor-pointer relative overflow-hidden"
+                            className="group flex items-center gap-6 p-6 bg-[var(--gpsx-bg-card)] border border-white/5 hover:border-[var(--gpsx-accent-primary)]/40 transition-all cursor-pointer relative overflow-hidden"
                         >
                             <div className="gpsx-scanline opacity-0 group-hover:opacity-5"></div>
 
-                            <div className="w-12 h-12 flex items-center justify-center bg-black border border-white/5 group-hover:border-[#00ff88]/20 text-slate-500 group-hover:text-[#00ff88] transition-all">
+                            <div className="w-12 h-12 flex items-center justify-center bg-[var(--gpsx-bg-main)] border border-white/5 group-hover:border-[var(--gpsx-accent-primary)]/20 text-slate-500 group-hover:text-[var(--gpsx-accent-primary)] transition-all">
                                 <FileAudio size={20} />
                             </div>
 
@@ -123,7 +123,7 @@ const HistoryPage: React.FC = () => {
                                     <Hash size={12} className="text-slate-700" />
                                     <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">{project.id.slice(0, 8)}</p>
                                 </div>
-                                <p className="text-white font-black text-sm uppercase tracking-wider truncate group-hover:text-[#00ff88] transition-colors">
+                                <p className="text-white font-black text-sm uppercase tracking-wider truncate group-hover:text-[var(--gpsx-accent-primary)] transition-colors">
                                     {project.originalFilename}
                                 </p>
                                 <div className="flex items-center gap-4 mt-2">
@@ -141,7 +141,7 @@ const HistoryPage: React.FC = () => {
                                             CRITICAL_FAIL
                                         </span>
                                     ) : (
-                                        <span className="text-[10px] font-black text-[#00ff88] uppercase tracking-widest flex items-center gap-2 border border-[#00ff88]/10 px-2 py-1 bg-[#00ff88]/5">
+                                        <span className="text-[10px] font-black text-[var(--gpsx-accent-primary)] uppercase tracking-widest flex items-center gap-2 border border-[var(--gpsx-accent-primary)]/10 px-2 py-1 bg-[var(--gpsx-accent-primary)]/5">
                                             <CheckCircle size={14} />
                                             RESOLVED
                                         </span>
@@ -149,7 +149,7 @@ const HistoryPage: React.FC = () => {
                                     <span className="text-[9px] text-slate-600 font-bold mt-2 uppercase tracking-widest">{formatTime(project.createdAt)}</span>
                                 </div>
 
-                                <div className="p-2 border border-white/5 group-hover:bg-[#00ff88] group-hover:text-black transition-all">
+                                <div className="p-2 border border-white/5 group-hover:bg-[var(--gpsx-accent-primary)] group-hover:text-black transition-all">
                                     <ChevronRight size={16} />
                                 </div>
                             </div>
@@ -160,7 +160,7 @@ const HistoryPage: React.FC = () => {
 
             <div className="pt-10 border-t border-white/5 flex justify-between items-center text-[9px] text-slate-700 font-bold uppercase tracking-[0.2em]">
                 <span>[ TOTAL_ENTRIES: {filteredProjects.length} ]</span>
-                <span className="text-[#00ff88]/40 italic">POWERED BY GPSX LAB</span>
+                <span className="text-[var(--gpsx-accent-primary)]/40 italic">POWERED BY GPSX LAB</span>
             </div>
         </div>
     );
