@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id               String   @id @default(uuid())
+  originalFilename String
+  filePath         String   // Path to compressed original audio
+  status           String   // UPLOADED, DRAFTING, POLISHING, COMPLETED
+  mode             String   @default("SOLO") // MANUAL | SOLO
+  checkpoint       String   @default("UPLOADED") // UPLOADED, COMPRESSED, CHUNKED, TRANSCRIBED, VALIDATED, POLISHED, MERGED, COMPLETE
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  promptConfig     String?  // JSON string storing { mode, tone, cleaningRules, customInstructions }
+
+  audioChunks      AudioChunk[]
+  draftDocuments   DraftDocument[]
+  finalDocuments   FinalDocument[]
+}
+
+model AudioChunk {
+  id           String   @id @default(uuid())
+  projectId    String
+  index        Int
+  filePath     String
+  durationMs   Int
+  isSilence    Boolean  @default(false)
+  
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  draftSegment DraftSegment?
+}
+
+model DraftSegment {
+  id                   String   @id @default(uuid())
+  chunkId              String   @unique
+  rawText              String
+  confidence           Float
+  providerResponseJson String   // Stored as JSON string
+  retryAttempt         Int      @default(0) // Tracks retry count for hallucination detection (max 3)
+  validationStatus     String   @default("PENDING") // PENDING, VERIFIED, HALLUCINATORY, FAILED
+  validationResult     String?  // JSON string: { hasHallucination, confidence, issues[], recommendation }
+  
+  audioChunk           AudioChunk @relation(fields: [chunkId], references: [id], onDelete: Cascade)
+  polishedSegment      PolishedSegment?
+}
+
+model DraftDocument {
+  id           String   @id @default(uuid())
+  projectId    String
+  fullTextPath String
+  version      Int
+  createdAt    DateTime @default(now())
+  
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model PolishedSegment {
+  id              String   @id @default(uuid())
+  draftSegmentId  String   @unique
+  polishedText    String
+  supervisorNotes String?
+  status          String   // PENDING, APPROVED, REJECTED
+  
+  draftSegment    DraftSegment @relation(fields: [draftSegmentId], references: [id], onDelete: Cascade)
+}
+
+model FinalDocument {
+  id           String   @id @default(uuid())
+  projectId    String
+  contentPath  String
+  createdAt    DateTime @default(now())
+  
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}

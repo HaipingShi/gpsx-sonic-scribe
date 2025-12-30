@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --gpsx-green: #00ff88;
+        --gpsx-green-glow: rgba(0, 255, 136, 0.4);
+        --gpsx-black: #000000;
+        --gpsx-slate: #0a0a0a;
+        --gpsx-border: #1a1a1a;
+    }
+
+    body {
+        @apply bg-black text-slate-200 antialiased;
+        font-family: 'Inter', 'system-ui', sans-serif;
+        font-size: 15px;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply tracking-tighter uppercase font-bold text-white;
+    }
+}
+
+@layer components {
+    .gpsx-glow {
+        text-shadow: 0 0 10px var(--gpsx-green-glow), 0 0 20px var(--gpsx-green-glow);
+    }
+
+    .gpsx-border {
+        @apply border border-[#00ff88]/20 hover:border-[#00ff88]/50 transition-all duration-300;
+        box-shadow: inset 0 0 10px rgba(0, 255, 136, 0.05);
+    }
+
+    .gpsx-card {
+        @apply bg-[#050505] border border-white/5 rounded-none p-6;
+        background-image:
+            linear-gradient(rgba(0, 255, 136, 0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 136, 0.02) 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    .gpsx-button {
+        @apply px-4 py-2 bg-transparent border border-[#00ff88]/40 text-[#00ff88] hover:bg-[#00ff88]/10 hover:border-[#00ff88] transition-all duration-200 uppercase tracking-[0.1em] text-sm font-bold;
+    }
+
+    .gpsx-scanline {
+        width: 100%;
+        height: 100px;
+        z-index: 10;
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(0, 255, 136, 0.02) 50%, rgba(0, 0, 0, 0) 100%);
+        opacity: 0.1;
+        position: fixed;
+        bottom: 100%;
+        pointer-events: none;
+        animation: scanline 10s linear infinite;
+    }
+}
+
+@keyframes scanline {
+    0% {
+        bottom: 100%;
+    }
+
+    100% {
+        bottom: -100px;
+    }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-black;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-[#1a1a1a] hover:bg-[#00ff88]/50 transition-all;
+}

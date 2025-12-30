@@ -1,0 +1,758 @@
+import { Request, Response } from 'express';
+import path from 'path';
+import fs from 'fs';
+import { PrismaClient } from '@prisma/client';
+import { compressAudio } from '../services/mediaEngine';
+import { smartSplitAudio } from '../services/vadService';
+import { transcribeChunk } from '../services/aliyunService';
+import { polishChunk } from '../services/deepSeekService';
+import { executeSoloPipeline, resumeFromCheckpoint, pausePipeline, getSoloStatus } from '../services/soloModeService';
+
+const prisma = new PrismaClient();
+
+export const createProject = async (req: Request, res: Response): Promise<void> => {
+    try {
+        if (!req.file) {
+            res.status(400).json({ error: 'No file uploaded' });
+            return;
+        }
+
+        const originalFile = req.file;
+        const uploadDir = path.dirname(originalFile.path);
+
+        console.log(`Processing upload: ${originalFile.filename}`);
+
+        // 1. Compress Audio
+        const compressedFilePath = await compressAudio(originalFile.path, uploadDir);
+
+        // 2. Delete Original (Heavy) File
+        fs.unlink(originalFile.path, (err) => {
+            if (err) console.error('Failed to cleanup original file:', err);
+            else console.log('Original file deleted to save space.');
+        });
+
+        // 3. VAD Smart Splitting
+        const chunks = await smartSplitAudio(compressedFilePath, uploadDir);
+
+        // 4. Create Database Entry with Chunks
+        const project = await prisma.project.create({
+            data: {
+                originalFilename: originalFile.originalname,
+                filePath: compressedFilePath,
+                status: 'UPLOADED', // Ready for transcription
+                audioChunks: {
+                    create: chunks.map(chunk => ({
+                        index: chunk.index,
+                        filePath: chunk.chunkPath,
+                        durationMs: chunk.durationMs,
+                        isSilence: false,
+                    }))
+                }
+            },
+            include: {
+                audioChunks: true
+            }
+        });
+
+        res.status(201).json(project);
+    } catch (error) {
+        console.error('Project creation failed:', error);
+        res.status(500).json({ error: 'Failed to process upload' });
+    }
+};
+
+export const listProjects = async (_req: Request, res: Response): Promise<void> => {
+    try {
+        const projects = await prisma.project.findMany({
+            orderBy: { createdAt: 'desc' },
+        });
+        res.json(projects);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch projects' });
+    }
+};
+
+export const deleteProject = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const project = await prisma.project.findUnique({ where: { id } });
+
+        if (!project) {
+            res.status(404).json({ error: 'Project not found' });
+            return;
+        }
+
+        // Delete File
+        if (fs.existsSync(project.filePath)) {
+            fs.unlink(project.filePath, (err) => {
+                if (err) console.error(`Failed to delete file: ${project.filePath}`, err);
+            });
+        }
+
+        // Delete from DB (Cascade will handle chunks)
+        await prisma.project.delete({ where: { id } });
+
+        res.status(200).json({ message: 'Project deleted' });
+    } catch (error) {
+        console.error("Delete Project Error:", error);
+        res.status(500).json({ error: 'Failed to delete project' });
+    }
+};
+
+export const getProject = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+
+        const project = await prisma.project.findUnique({
+            where: { id },
+            include: {
+                audioChunks: {
+                    include: {
+                        draftSegment: {
+                            include: {
+                                polishedSegment: true
+                            }
+                        }
+                    },
+                    orderBy: { index: 'asc' }
+                },
+                draftDocuments: true,
+                finalDocuments: true,
+            },
+        });
+
+        if (!project) {
+            res.status(404).json({ error: 'Project not found' });
+            return;
+        }
+
+        // Map to Frontend Interface (calculate times and structure segments)
+        let currentTime = 0;
+        const chunks = project.audioChunks.map(chunk => {
+            const startTime = currentTime;
+            const endTime = currentTime + (chunk.durationMs / 1000);
+            currentTime = endTime;
+
+            const draftSegments = chunk.draftSegment ? [{
+                startTime,
+                endTime,
+                text: chunk.draftSegment.rawText
+            }] : [];
+
+            const polishedSegments = chunk.draftSegment?.polishedSegment ? [{
+                startTime,
+                endTime,
+                text: chunk.draftSegment.polishedSegment.polishedText
+            }] : [];
+
+            // Determine chunk status
+            let status = 'PENDING';
+            if (chunk.draftSegment) status = 'TRANSCRIBED';
+            if (chunk.draftSegment?.polishedSegment) status = 'POLISHED';
+
+            return {
+                id: chunk.id,
+                startTime,
+                endTime,
+                status,
+                draftSegments,
+                polishedSegments
+            };
+        });
+
+        res.json({ ...project, chunks });
+    } catch (error) {
+        console.error("Get Project Error:", error);
+        res.status(500).json({ error: 'Failed to fetch project' });
+    }
+};
+
+/**
+ * Triggers transcription for all chunks in a project.
+ * POST /api/projects/:id/transcribe
+ */
+export const startTranscription = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const project = await prisma.project.findUnique({
+            where: { id },
+            include: { audioChunks: true }
+        });
+
+        if (!project) {
+            res.status(404).json({ error: 'Project not found' });
+            return;
+        }
+
+        // Update status
+        await prisma.project.update({ where: { id }, data: { status: 'DRAFTING' } });
+
+        // Process Chunks (Fire and Forget / Async Background)
+        (async () => {
+            for (const chunk of project.audioChunks) {
+                try {
+                    const text = await transcribeChunk(chunk.filePath);
+
+                    await prisma.draftSegment.upsert({
+                        where: { chunkId: chunk.id },
+                        update: { rawText: text },
+                        create: {
+                            chunkId: chunk.id,
+                            rawText: text,
+                            confidence: 0.9,
+                            providerResponseJson: '{}'
+                        }
+                    });
+                    console.log(`Chunk ${chunk.index} transcribed.`);
+                } catch (err) {
+                    console.error(`Chunk ${chunk.index} failed:`, err);
+                }
+            }
+
+            await prisma.project.update({ where: { id }, data: { status: 'POLISHING' } });
+        })();
+
+        res.json({ message: 'Transcription started', chunkCount: project.audioChunks.length });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Transcription start failed' });
+    }
+};
+
+/**
+ * Triggers polishing with Context Window.
+ * POST /api/projects/:id/polish
+ * Body: { mode, tone, cleaningRules, customInstructions }
+ */
+export const startPolishing = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const { mode, tone, cleaningRules, customInstructions } = req.body;
+
+        const project = await prisma.project.findUnique({
+            where: { id },
+            include: {
+                audioChunks: { include: { draftSegment: true } }
+            }
+        });
+
+        if (!project) {
+            res.status(404).json({ error: 'Project not found' });
+            return;
+        }
+
+        // Save Prompt Config if provided
+        if (mode || tone || cleaningRules || customInstructions) {
+            await prisma.project.update({
+                where: { id },
+                data: {
+                    promptConfig: JSON.stringify({ mode, tone, cleaningRules, customInstructions })
+                }
+            });
+        }
+
+        // Update status
+        await prisma.project.update({ where: { id }, data: { status: 'POLISHING' } });
+
+        // Polishing Logic
+        const config = { mode, tone, cleaningRules, customInstructions };
+        const chunks = project.audioChunks.sort((a, b) => a.index - b.index);
+
+        (async () => {
+            let previousContext = "";
+
+            for (const chunk of chunks) {
+                if (!chunk.draftSegment) continue;
+
+                try {
+                    console.log(`Polishing chunk ${chunk.index}...`);
+                    const polishedText = await polishChunk({
+                        previousContext,
+                        currentRawText: chunk.draftSegment.rawText,
+                        config
+                    });
+
+                    await prisma.polishedSegment.upsert({
+                        where: { draftSegmentId: chunk.draftSegment.id },
+                        update: { polishedText, status: 'APPROVED' },
+                        create: {
+                            draftSegmentId: chunk.draftSegment.id,
+                            polishedText: polishedText,
+                            status: 'APPROVED'
+                        }
+                    });
+
+                    // Update Context
+                    previousContext += polishedText + " ";
+                    if (previousContext.length > 5000) {
+                        previousContext = previousContext.slice(-2000);
+                    }
+                } catch (err) {
+                    console.error(`Polishing chunk ${chunk.index} failed`, err);
+                }
+            }
+
+            await prisma.project.update({ where: { id }, data: { status: 'COMPLETED' } });
+        })();
+
+        res.json({ message: 'Polishing started (Sequential)' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Polishing failed' });
+    }
+};
+
+export const downloadResult = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const project = await prisma.project.findUnique({
+            where: { id },
+            include: {
+                audioChunks: {
+                    include: {
+                        draftSegment: {
+                            include: { polishedSegment: true }
+                        }
+                    },
+                    orderBy: { index: 'asc' }
+                }
+            }
+        });
+
+        if (!project) {
+            res.status(404).json({ error: 'Project not found' });
+            return;
+        }
+
+        // Aggregate Text
+        let content = "";
+        project.audioChunks.forEach(chunk => {
+            if (chunk.draftSegment?.polishedSegment) {
+                content += chunk.draftSegment.polishedSegment.polishedText + "\n\n";
+            } else if (chunk.draftSegment) {
+                content += chunk.draftSegment.rawText + "\n\n";
+            }
+        });
+
+        if (!content) {
+            content = "No content generated yet.";
+        }
+
+        res.setHeader('Content-Type', 'text/plain');
+        res.setHeader('Content-Disposition', `attachment; filename="${project.originalFilename}_result.txt"`);
+        res.send(content);
+
+    } catch (error) {
+        console.error("Download Error:", error);
+        res.status(500).json({ error: 'Failed to download result' });
+    }
+};
+
+// ============================================================================
+// Solo Mode Controller Functions
+// ============================================================================
+
+/**
+ * Start Solo Mode automation for a project
+ * POST /api/projects/:id/solo/start
+ */
+export const startSoloMode = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+
+        const project = await prisma.project.findUnique({ where: { id } });
+        if (!project) {
+            res.status(404).json({ error: 'Project not found' });
+            return;
+        }
+
+        // Start pipeline in background (non-blocking)
+        executeSoloPipeline(id).catch(err => {
+            console.error(`[Solo] Pipeline failed for ${id}:`, err);
+        });
+
+        res.json({
+            message: 'Solo Mode started',
+            projectId: id,
+            status: 'PROCESSING'
+        });
+
+    } catch (error) {
+        console.error("Start Solo Mode Error:", error);
+        res.status(500).json({ error: 'Failed to start Solo Mode' });
+    }
+};
+
+/**
+ * Resume Solo Mode automation from checkpoint
+ * POST /api/projects/:id/solo/resume
+ */
+export const resumeSoloMode = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+
+        const project = await prisma.project.findUnique({ where: { id } });
+        if (!project) {
+            res.status(404).json({ error: 'Project not found' });
+            return;
+        }
+
+        if (project.mode !== 'SOLO') {
+            res.status(400).json({ error: 'Project is not in Solo Mode' });
+            return;
+        }
+
+        // Resume pipeline in background
+        resumeFromCheckpoint(id).catch(err => {
+            console.error(`[Solo] Resume failed for ${id}:`, err);
+        });
+
+        res.json({
+            message: 'Solo Mode resumed',
+            projectId: id,
+            checkpoint: project.checkpoint
+        });
+
+    } catch (error) {
+        console.error("Resume Solo Mode Error:", error);
+        res.status(500).json({ error: 'Failed to resume Solo Mode' });
+    }
+};
+
+/**
+ * Pause Solo Mode automation
+ * POST /api/projects/:id/solo/pause
+ */
+export const pauseSoloMode = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+
+        pausePipeline(id);
+
+        res.json({
+            message: 'Solo Mode paused',
+            projectId: id
+        });
+
+    } catch (error) {
+        console.error("Pause Solo Mode Error:", error);
+        res.status(500).json({ error: 'Failed to pause Solo Mode' });
+    }
+};
+
+/**
+ * Get Solo Mode real-time status
+ * GET /api/projects/:id/solo/status
+ */
+export const getSoloModeStatus = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+
+        const status = await getSoloStatus(id);
+        res.json(status);
+
+    } catch (error) {
+        console.error("Get Solo Status Error:", error);
+        res.status(500).json({ error: 'Failed to get Solo Mode status' });
+    }
+};
+
+/**
+ * Get merged document with raw and polished text for comparison
+ * GET /api/projects/:id/merged
+ */
+export const getMergedDocument = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+
+        const project = await prisma.project.findUnique({
+            where: { id },
+            include: {
+                audioChunks: {
+                    orderBy: { index: 'asc' },
+                    include: {
+                        draftSegment: {
+                            include: {
+                                polishedSegment: true,
+                            },
+                        },
+                    },
+                },
+                finalDocuments: true,
+            },
+        });
+
+        if (!project) {
+            res.status(404).json({ error: 'Project not found' });
+            return;
+        }
+
+        // Build comparison data for each chunk
+        const chunks = project.audioChunks
+            .filter((chunk: typeof project.audioChunks[0]) => !chunk.isSilence)
+            .map((chunk: typeof project.audioChunks[0]) => ({
+                index: chunk.index,
+                chunkId: chunk.id,
+                audioPath: `/storage/uploads/chunks/${path.basename(chunk.filePath)}`,
+                durationMs: chunk.durationMs,
+                rawText: chunk.draftSegment?.rawText || '',
+                polishedText: chunk.draftSegment?.polishedSegment?.polishedText || '',
+                status: chunk.draftSegment?.polishedSegment?.status || 'PENDING',
+                hasRepetition: chunk.draftSegment?.validationResult
+                    ? JSON.parse(chunk.draftSegment.validationResult).hasRepetition
+                    : false,
+            }));
+
+        // Build merged content
+        const mergedRaw = chunks.map((c: { rawText: string }) => c.rawText).filter(Boolean).join('\n\n');
+        const mergedPolished = chunks.map((c: { polishedText: string; rawText: string }) => c.polishedText || c.rawText).filter(Boolean).join('\n\n');
+
+        // Get latest final document
+        const latestFinalDoc = project.finalDocuments[0];
+
+        res.json({
+            projectId: id,
+            status: project.status,
+            checkpoint: project.checkpoint,
+            chunks,
+            merged: {
+                raw: mergedRaw,
+                polished: mergedPolished,
+            },
+            finalDocumentPath: latestFinalDoc?.contentPath,
+        });
+
+    } catch (error) {
+        console.error("Get Merged Document Error:", error);
+        res.status(500).json({ error: 'Failed to get merged document' });
+    }
+};
+
+/**
+ * Intelligent Text Analysis
+ * POST /api/projects/polish/analyze
+ * Body: { text }
+ */
+export const analyzeText = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { text } = req.body;
+        if (!text || text.length < 10) {
+            res.status(400).json({ error: 'Text too short for analysis' });
+            return;
+        }
+
+        // Use DeepSeek to analyze
+        const { polishChunkWithValidation } = require('../services/deepSeekService');
+        const client = require('../services/deepSeekService').getNextClient();
+
+        const systemPrompt = `You are a text analysis assistant. Analyze the input text and suggest the best polishing configuration.
+Return ONLY a JSON object with:
+{
+  "recommendedStrategy": "paragraph" | "sentence" | "chars",
+  "recommendedTone": "Professional" | "Casual" | "Academic",
+  "suggestedHotwords": ["word1", "word2"],
+  "summary": "Brief analysis of the text structure and content"
+}`;
+
+        const response = await client.chat.completions.create({
+            model: 'deepseek-chat',
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: text.slice(0, 2000) } // Analysis only needs a sample
+            ],
+            temperature: 0.2,
+            response_format: { type: 'json_object' },
+        });
+
+        const analysis = JSON.parse(response.choices[0].message.content || '{}');
+        res.json(analysis);
+
+    } catch (error) {
+        console.error("Analyze Text Error:", error);
+        res.status(500).json({ error: 'Analysis failed' });
+    }
+};
+
+// Single Chunk Operations for Manual Mode
+export const transcribeSingleChunk = async (req: Request, res: Response): Promise<void> => {
+    const { projectId, chunkId } = req.params;
+
+    try {
+        // Verify project exists
+        const project = await prisma.project.findUnique({
+            where: { id: projectId },
+        });
+
+        if (!project) {
+            res.status(404).json({ error: 'Project not found' });
+            return;
+        }
+
+        // Get chunk
+        const chunk = await prisma.audioChunk.findUnique({
+            where: { id: chunkId },
+            include: { draftSegment: true },
+        });
+
+        if (!chunk || chunk.projectId !== projectId) {
+            res.status(404).json({ error: 'Chunk not found' });
+            return;
+        }
+
+        console.log(`[Manual Mode] Transcribing chunk ${chunk.index} for project ${projectId}`);
+
+        // Transcribe the chunk
+        const transcription = await transcribeChunk(chunk.filePath);
+
+        // Save or update draft segment
+        await prisma.transcriptionSegment.upsert({
+            where: { chunkId },
+            update: {
+                text: transcription,
+                language: 'zh',
+            },
+            create: {
+                chunkId,
+                text: transcription,
+                language: 'zh',
+                type: 'DRAFT',
+            },
+        });
+
+        console.log(`[Manual Mode] Chunk ${chunk.index} transcribed successfully`);
+
+        res.json({
+            success: true,
+            chunkId,
+            transcription,
+        });
+    } catch (error: any) {
+        console.error('[Manual Mode] Transcription failed:', error.message);
+        res.status(500).json({ error: error.message || 'Transcription failed' });
+    }
+};
+
+export const polishSingleChunk = async (req: Request, res: Response): Promise<void> => {
+    const { projectId, chunkId } = req.params;
+    const { config } = req.body;
+
+    try {
+        // Get chunk with draft segment
+        const chunk = await prisma.audioChunk.findUnique({
+            where: { id: chunkId },
+            include: {
+                draftSegment: true,
+                polishedSegment: true,
+            },
+        });
+
+        if (!chunk || chunk.projectId !== projectId) {
+            res.status(404).json({ error: 'Chunk not found' });
+            return;
+        }
+
+        if (!chunk.draftSegment) {
+            res.status(400).json({ error: 'Chunk must be transcribed first' });
+            return;
+        }
+
+        console.log(`[Manual Mode] Polishing chunk ${chunk.index} for project ${projectId}`);
+
+        // Get previous context (from previous chunks)
+        const previousChunks = await prisma.audioChunk.findMany({
+            where: {
+                projectId,
+                index: { lt: chunk.index },
+            },
+            include: { polishedSegment: true },
+            orderBy: { index: 'asc' },
+            take: 3, // Last 3 chunks for context
+        });
+
+        const previousContext = previousChunks
+            .map(c => c.polishedSegment?.text || '')
+            .join('\n');
+
+        // Polish the chunk
+        const polished = await polishChunk({
+            previousContext,
+            currentRawText: chunk.draftSegment.text,
+            config: config || {},
+        });
+
+        // Save or update polished segment
+        await prisma.transcriptionSegment.upsert({
+            where: { chunkId },
+            update: {
+                text: polished,
+                language: 'zh',
+            },
+            create: {
+                chunkId,
+                text: polished,
+                language: 'zh',
+                type: 'POLISHED',
+            },
+        });
+
+        console.log(`[Manual Mode] Chunk ${chunk.index} polished successfully`);
+
+        res.json({
+            success: true,
+            chunkId,
+            polishedText: polished,
+        });
+    } catch (error: any) {
+        console.error('[Manual Mode] Polishing failed:', error.message);
+        res.status(500).json({ error: error.message || 'Polishing failed' });
+    }
+};
+
+export const retrySingleChunk = async (req: Request, res: Response): Promise<void> => {
+    const { projectId, chunkId } = req.params;
+
+    try {
+        // Get chunk
+        const chunk = await prisma.audioChunk.findUnique({
+            where: { id: chunkId },
+        });
+
+        if (!chunk || chunk.projectId !== projectId) {
+            res.status(404).json({ error: 'Chunk not found' });
+            return;
+        }
+
+        console.log(`[Manual Mode] Retrying chunk ${chunk.index} for project ${projectId}`);
+
+        // Delete existing segments (to retry from scratch)
+        await prisma.transcriptionSegment.deleteMany({
+            where: { chunkId },
+        });
+
+        // Re-transcribe
+        const transcription = await transcribeChunk(chunk.filePath);
+
+        // Save new draft segment
+        await prisma.transcriptionSegment.create({
+            data: {
+                chunkId,
+                text: transcription,
+                language: 'zh',
+                type: 'DRAFT',
+            },
+        });
+
+        console.log(`[Manual Mode] Chunk ${chunk.index} retried successfully`);
+
+        res.json({
+            success: true,
+            chunkId,
+            transcription,
+        });
+    } catch (error: any) {
+        console.error('[Manual Mode] Retry failed:', error.message);
+        res.status(500).json({ error: error.message || 'Retry failed' });
+    }
+};
